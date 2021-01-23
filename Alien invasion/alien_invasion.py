@@ -26,7 +26,7 @@ class AlienInvasion:
 
         self._create_fleet()
 
-        self.play_button = Button(self, "Play")
+        self.button = Button(self)
 
     def run_game(self):
         while True:
@@ -46,6 +46,8 @@ class AlienInvasion:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 self._check_play_button(mouse_pos)
+                self._check_rules_button(mouse_pos)
+                self._check_back_button(mouse_pos)
             elif event.type == pygame.KEYDOWN:#keydown means if any key is pressed
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:#keyup is the event of lifting up a key
@@ -53,8 +55,8 @@ class AlienInvasion:
 
     def _check_play_button(self,mouse_pos):
         """start new game when player clicks button"""
-        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
-        if button_clicked and not self.stats.game_active:
+        button_clicked = self.button.play_rect.collidepoint(mouse_pos)
+        if button_clicked and not self.stats.game_active and not self.stats.rules_active:
             self.settings.initialise_dynamic_settings()
             self.stats.reset_stats()
             self.sb._prep_score()
@@ -67,6 +69,21 @@ class AlienInvasion:
             self.bullets.empty()
             self._create_fleet()
             self.ship.center_ship()
+
+    def _check_rules_button(self,mouse_pos):
+        """changes rules_active if button clicked"""
+        button_clicked = self.button.rules_rect.collidepoint(mouse_pos)
+        if button_clicked and not self.stats.game_active:
+            self.stats.rules_active = True
+
+    def _check_back_button(self,mouse_pos):
+        """changes rules_active back to false if button clicked"""
+        button_clicked = self.button.back_rect.collidepoint(mouse_pos)
+        if button_clicked and not self.stats.game_active and self.stats.rules_active:
+            self.stats.rules_active = False
+
+            
+
 
     def _check_keydown_events(self,event):
         """responds to key presses"""
@@ -201,8 +218,11 @@ class AlienInvasion:
         self.aliens.draw(self.screen)
         self.sb.show_score()
         #draws play button if game is inactive
-        if not self.stats.game_active:
-            self.play_button.draw_button()
+        if not self.stats.game_active and not self.stats.rules_active:
+            self.button.draw_buttons()
+        if self.stats.rules_active:
+            self.button.draw_instructions_msg()
+            self.button.draw_back_button()
         pygame.display.flip() #constantly updates screen to any new changes that may have happened
 
 if __name__ == '__main__':
