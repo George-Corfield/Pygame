@@ -29,7 +29,7 @@ class Ship(Sprite):
         def blitme(self):
                 """draws ship in correct position"""
                 self.screen.blit(self.image, self.rect)
-                print(self.rect)
+                
 
         def center_ship(self):
                 """center the ship on screen"""
